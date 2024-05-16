@@ -17,7 +17,7 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         parameters = parse_qs(parsed_url.query)
 
         if file_name == os.sep:
-            file_name = '\\index.html'
+            file_name = os.sep + 'index.html'
 
         absolutePath = os.getcwd() + os.sep + 'resources' + file_name
 
