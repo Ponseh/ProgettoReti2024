@@ -12,7 +12,7 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         parsed_url = urlparse(self.path)
         path = unquote(parsed_url.path)
         file_name = os.path.normpath(path)
-        print(file_name)
+        
         # Eventuali parametri li salvo in un array
         parameters = parse_qs(parsed_url.query)
 
