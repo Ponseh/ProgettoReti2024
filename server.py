@@ -3,7 +3,7 @@ import mimetypes
 import http.server
 import socketserver
 from urllib.parse import unquote, urlparse, parse_qs
-
+import signal
 
 class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
@@ -41,7 +41,11 @@ class MyHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                   f"codice di risposta \"404\" (Not Found)\nSono "
                   f"stati passati questi parametri: {parameters}\n")
 
-
+def signal_handler(sig, frame):
+    print('Chiusura del server...')
+    httpd.server_close()
+    print('Server chiuso correttamente')
+    exit(0)
 
 class MyThreadedTCPServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
@@ -49,10 +53,17 @@ class MyThreadedTCPServer(socketserver.ThreadingTCPServer):
 
 def run(server_class=MyThreadedTCPServer, handler_class=MyHTTPRequestHandler,
         address='127.0.0.1', port=8000):
+    global httpd
     server_address = (address, port)
-    httpd = server_class(server_address, handler_class)
-    print(f"Server funzionante su: http://{address}:{port} ...\n")
-    httpd.serve_forever()
+    
+    signal.signal(signal.SIGINT, signal_handler)
+
+    try:
+        httpd = server_class(server_address, handler_class)
+        print(f"Server funzionante su: http://{address}:{port} ...\n")
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.shutdown()
 
 if __name__ == '__main__':
     run()
